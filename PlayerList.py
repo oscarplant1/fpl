@@ -33,6 +33,7 @@ class PlayerList:
             self.List = sub_list
 
         #Filter by team
+        #######NOT FUTURE SEASON PROOF#######
         if team in ["Arsenal","Aston Villa","Bournemouth","Brentford","Brighton","Chelsea","Crystal Palace","Everton","Fulham","Ipswich","Leicester","Liverpool","Man City","Man Utd","Newcastle","Nott'm Forest","Southampton","Spurs","West Ham","Wolves"]:
             sub_list = []
             for i in range(len(self.List)):

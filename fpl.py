@@ -21,23 +21,25 @@ import dearpygui.dearpygui as dpg
 # %%
 dpg.create_context()
 dpg.create_viewport(title='Custom Title')
+dpg.set_global_font_scale(3)
 
-with dpg.window(label="MainWindow",width = 375, height=200):
+with dpg.window(label="MainWindow",width = 600, height=250,tag="main_window"):
+
+    dpg.add_button(label="Player1",tag="player1")
+
     dpg.add_text("Enter Team ID",tag="Team_ID_Instruction")
-
     input_field = dpg.add_input_text(label="Enter ID",tag="input_box")
-    
-    def on_button_click(sender, app_data):
+
+    def submit_id_button_click(sender, app_data):
         entered_text = dpg.get_value(input_field)
         if entered_text.isdigit():
-            dpg.delete_item("Submit_button")
-            dpg.delete_item("input_box")
             dpg.delete_item("Team_ID_Instruction")
-            currentPlan = Plan(int(entered_text))
+            dpg.delete_item("input_box")
+            dpg.delete_item("Submit_button")
 
+    dpg.add_button(label="Submit",callback=submit_id_button_click, tag="Submit_button")
 
-    dpg.add_button(label="Submit",callback=on_button_click, tag="Submit_button")
-
+dpg.set_primary_window("main_window",True)        
 dpg.setup_dearpygui()
 dpg.show_viewport()
 dpg.maximize_viewport()

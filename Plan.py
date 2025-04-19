@@ -40,31 +40,37 @@ class Plan:
             GW_fixtures = fixtures[fixtures["event"]==GW]
             for team_id in range(1,21):
                 fixture_details = []
+                home_fixture_indices = []
+                away_fixture_indices = []
                 #Check home column
                 if team_id in GW_fixtures["team_h"].values:
-                    fixture_indices = []
                     for i in range(len(GW_fixtures["team_h"].values)):
                         if GW_fixtures["team_h"].values[i] == team_id:
-                            fixture_indices.append(i)
+                            home_fixture_indices.append(i)
 
-                    for k in range(len(fixture_indices)):
-                        opponent = GW_fixtures["team_a"].values[fixture_indices[k]].item()
-                        difficulty = GW_fixtures["team_h_difficulty"].values[fixture_indices[k]].item()
+                    for k in range(len(home_fixture_indices)):
+                        opponent = GW_fixtures["team_a"].values[home_fixture_indices[k]].item()
+                        difficulty = GW_fixtures["team_h_difficulty"].values[home_fixture_indices[k]].item()
                         fixture_details.append(opponent)
                         fixture_details.append(difficulty)
 
                 #Check away column
                 if team_id in GW_fixtures["team_a"].values:
-                    fixture_indices = []
                     for i in range(len(GW_fixtures["team_a"].values)):
                         if GW_fixtures["team_a"].values[i] == team_id:
-                            fixture_indices.append(i)
+                            away_fixture_indices.append(i)
 
-                    for k in range(len(fixture_indices)):
-                        opponent = GW_fixtures["team_h"].values[fixture_indices[k]].item()
-                        difficulty = GW_fixtures["team_a_difficulty"].values[fixture_indices[k]].item()
-                        fixture_details.append(opponent)
-                        fixture_details.append(difficulty)
+                    for k in range(len(away_fixture_indices)):
+                        opponent = GW_fixtures["team_h"].values[away_fixture_indices[k]].item()
+                        difficulty = GW_fixtures["team_a_difficulty"].values[away_fixture_indices[k]].item()
+
+                        home_fixture_indices.append(away_fixture_indices[k])
+                        home_fixture_indices.sort()
+                        new_index = home_fixture_indices.index(away_fixture_indices[k])
+                        fixture_details.insert(2*new_index,opponent)
+                        fixture_details.insert(2*new_index+1,difficulty)
+
+                #Insert away fixtures in correct spot between/before/after home fixtures
 
                 self.FDR[team_id-1][GW-1] = fixture_details
                 

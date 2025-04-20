@@ -7,6 +7,14 @@ class Plan:
     def __init__(self,id):
         self.id = id
 
+        r = requests.get(base_url+'bootstrap-static/').json()
+
+        players = pd.json_normalize(r['elements'])
+        teams = pd.json_normalize(r['teams'])
+        positions = pd.json_normalize(r['element_types'])
+
+        self.team_list = teams["name"].values
+
         r = 0
         self.next_GW = 0
         while r != {'detail': 'Not found.'}:
@@ -25,11 +33,8 @@ class Plan:
         url = "https://fantasy.premierleague.com/api/fixtures/"
         r = requests.get(url).json()
         fixtures = pd.json_normalize(r)
-        self.fixtures = fixtures
-
 
         #FDR table
-
         #Team "id"s go from 1-20
         #Setting up 2D array 20* 38 - add difficulty and DGWs to 3rd dimension
         self.FDR = [0]*20
@@ -50,8 +55,9 @@ class Plan:
 
                     for k in range(len(home_fixture_indices)):
                         opponent = GW_fixtures["team_a"].values[home_fixture_indices[k]].item()
-                        difficulty = GW_fixtures["team_h_difficulty"].values[home_fixture_indices[k]].item()
+                        difficulty = GW_fixtures["team_h_difficulty"].values[home_fixture_indices[k]].item() - 1
                         fixture_details.append(opponent)
+                        fixture_details.append("H")
                         fixture_details.append(difficulty)
 
                 #Check away column
@@ -62,18 +68,30 @@ class Plan:
 
                     for k in range(len(away_fixture_indices)):
                         opponent = GW_fixtures["team_h"].values[away_fixture_indices[k]].item()
-                        difficulty = GW_fixtures["team_a_difficulty"].values[away_fixture_indices[k]].item()
+                        difficulty = GW_fixtures["team_a_difficulty"].values[away_fixture_indices[k]].item() - 1
 
+                        #Insert away fixtures in correct spot between/before/after home fixtures
                         home_fixture_indices.append(away_fixture_indices[k])
                         home_fixture_indices.sort()
                         new_index = home_fixture_indices.index(away_fixture_indices[k])
-                        fixture_details.insert(2*new_index,opponent)
-                        fixture_details.insert(2*new_index+1,difficulty)
-
-                #Insert away fixtures in correct spot between/before/after home fixtures
+                        fixture_details.insert(3*new_index,opponent)
+                        fixture_details.insert(3*new_index+1,"A")
+                        fixture_details.insert(3*new_index+2,difficulty)
+ 
 
                 self.FDR[team_id-1][GW-1] = fixture_details
                 
+
+    def print_fixtures(self,GW):
+        for i in range(20):
+            print_list = []
+            for j in range(len(self.FDR[i][GW-1])):
+                if j%3==0:
+                    print_list.append(self.team_list[self.FDR[i][GW-1][j]-1])
+                else:
+                    print_list.append(self.FDR[i][GW-1][j])
+            print(print_list)
+
 
     def page_fwd(self):
         if self.page < (38 - self.next_GW) and len(self.future_GWs[self.page].squad) == 15:

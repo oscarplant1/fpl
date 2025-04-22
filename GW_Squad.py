@@ -18,6 +18,8 @@ class GW_Squad:
 
         self.input_GW = GW
         self.squad = [0] * 15
+        self.empty_spot_indices = []
+        self.empty_spot_positions = []
 
         self.ClearSquad()
  
@@ -135,13 +137,33 @@ class GW_Squad:
             self.squad.remove(self.squad[squad_ids.index(id)])
             self.count_Positions()
 
+            self.empty_spot_positions.append(player_to_remove.position_short)
+            self.empty_spot_indices.append(squad_ids.index(id))
+
+            for i in range(squad_ids.index(id)+1,len(self.empty_spot_indices)):
+                self.empty_spot_indices[i]-=1
+
     def add_player(self,id):
         player_to_add = Player(id)
         player_counts = [self.GKcount,self.DEFcount,self.MIDcount,self.FWDcount]
         if player_counts[self.player_positions.index(player_to_add.position_short)] < self.max_player_counts[self.player_positions.index(player_to_add.position_short)]:
-            self.squad.append(player_to_add)
-            self.selling_prices.append(player_to_add.now_cost/10)
-            self.purchase_prices.append(player_to_add.now_cost/10)
+            #Get correct index to insert player
+            correct_index_postion = 0
+            while self.empty_spot_positions[correct_index_postion] != player_to_add.position_short:
+                correct_index_postion += 1
+            
+            correct_index = self.empty_spot_indices[correct_index_postion]
+
+            self.empty_spot_indices.remove(self.empty_spot_indices[correct_index_postion])
+            self.empty_spot_positions.remove(self.empty_spot_positions[correct_index_postion])
+
+            for i in range(correct_index_postion,len(self.empty_spot_indices)):
+                self.empty_spot_indices[i]+=1
+
+            self.squad.insert(correct_index,player_to_add)
+            self.selling_prices.insert(correct_index,player_to_add.now_cost/10)
+            self.purchase_prices.insert(correct_index,player_to_add.now_cost/10)
+
             player_counts[self.player_positions.index(player_to_add.position_short)] += 1
 
             self.GKcount = player_counts[0]

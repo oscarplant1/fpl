@@ -32,6 +32,29 @@ def submit_button_click():
         button.destroy()
         create_plan(ID)
 
+
+substitute_player_picked = False
+def substitute_button_click(ID):
+    global substitute_player_picked
+    substitute_player_picked = True
+    substitute_player_id = ID
+
+
+    position_selected = Player(substitute_player_id).position_short
+    squad_ids = new_plan.send_current_players()[1]
+
+    ###Highlight same player
+    player_buttons[squad_ids.index(substitute_player_id)].destroy()
+
+    if substitute_player_id in squad_ids[:11]:
+        pass
+        ###Highlight bench players
+    else:
+        pass
+        ###Highlight starting players
+
+    ###Highlight same player - to unselect player
+
 def close_selected_player():
     player_info_text.destroy()
 
@@ -57,27 +80,36 @@ button = tk.Button(
 )
 
 def player_click(player_number):
-    for i in range(len(player_buttons)):
-        player_buttons[i].destroy()
-    next_GW_button.destroy()
-    previous_GW_button.destroy()
+    if substitute_player_picked:
+        ###Check if substitution is allowed
+        ###Make substitution
+        ###Reset Buttons
+        pass
+    else:
+        for i in range(len(player_buttons)):
+            player_buttons[i].destroy()
+        next_GW_button.destroy()
+        previous_GW_button.destroy()
 
-    clicked_player = new_plan.future_GWs[new_plan.page].squad[player_number-1]
-    
-    global close_button
-    close_button = tk.Button(text="X",command=close_selected_player)
-    close_button.pack()
+        clicked_player = new_plan.future_GWs[new_plan.page].squad[player_number-1]
+        
+        global close_button
+        close_button = tk.Button(text="X",command=close_selected_player)
+        close_button.pack()
 
-    global player_info_text
-    player_info_text = tk.Text(window)
-    player_info_text.pack()
-    player_info_text.insert(tk.END,clicked_player.first_name + " " + clicked_player.second_name + "\n" +
-                             clicked_player.team_full_name + "\n" + 
-                             clicked_player.singular_position + "\n" + 
-                             "Price: " + str(clicked_player.now_cost/10) + "\n" +
-                             "Pts / Match: " + str(clicked_player.pts_per_match) + "\n" +
-                             "Form: " + str(clicked_player.form) + "\n" +
-                             "Selected by: " + str(clicked_player.ownership))
+        global player_info_text
+        player_info_text = tk.Text(window)
+        player_info_text.pack()
+        player_info_text.insert(tk.END,clicked_player.first_name + " " + clicked_player.second_name + "\n" +
+                                clicked_player.team_full_name + "\n" + 
+                                clicked_player.singular_position + "\n" + 
+                                "Price: " + str(clicked_player.now_cost/10) + "\n" +
+                                "Pts / Match: " + str(clicked_player.pts_per_match) + "\n" +
+                                "Form: " + str(clicked_player.form) + "\n" +
+                                "Selected by: " + str(clicked_player.ownership))
+
+        substitute_button = tk.Button(text="Substitute",command=lambda: substitute_button_click(clicked_player.id))
+        substitute_button.pack()
 
 def next_GW_click():
     new_plan.page_fwd()

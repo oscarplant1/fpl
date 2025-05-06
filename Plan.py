@@ -55,7 +55,7 @@ class Plan:
 
                     for k in range(len(home_fixture_indices)):
                         opponent = GW_fixtures["team_a"].values[home_fixture_indices[k]].item()
-                        difficulty = GW_fixtures["team_h_difficulty"].values[home_fixture_indices[k]].item() - 1
+                        difficulty = GW_fixtures["team_h_difficulty"].values[home_fixture_indices[k]].item()
                         fixture_details.append(opponent)
                         fixture_details.append("H")
                         fixture_details.append(difficulty)
@@ -68,7 +68,7 @@ class Plan:
 
                     for k in range(len(away_fixture_indices)):
                         opponent = GW_fixtures["team_h"].values[away_fixture_indices[k]].item()
-                        difficulty = GW_fixtures["team_a_difficulty"].values[away_fixture_indices[k]].item() - 1
+                        difficulty = GW_fixtures["team_a_difficulty"].values[away_fixture_indices[k]].item()
 
                         #Insert away fixtures in correct spot between/before/after home fixtures
                         home_fixture_indices.append(away_fixture_indices[k])

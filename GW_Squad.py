@@ -3,6 +3,8 @@ from PlayerList import PlayerList
 import warnings
 tqdm.pandas()
 
+possible_formations = ["343","352","433","442","451","523","532","541"]
+
 class GW_Squad:
     def __init__(self,id,GW):
 
@@ -68,7 +70,7 @@ class GW_Squad:
                 current_player = Player(int(picks[picks["position"]==i+1]["element"].to_string(index=False)))
                 if current_player.position_short != "MNG":
                     self.squad[i] = current_player
-        
+
         #Import transfer History and get purchase prices
         url = "https://fantasy.premierleague.com/api/entry/" + str(self.id) + "/transfers/"
         r = requests.get(url).json()
@@ -110,18 +112,20 @@ class GW_Squad:
             if not isinstance(self.squad[i],int):
                     player_counts[self.player_positions.index(self.squad[i].position_short)] += 1
 
+            if i == 10:
+                self.formation = str(player_counts[1]) + str(player_counts[2]) + str(player_counts[3])
+
         self.GKcount = player_counts[0]
         self.DEFcount = player_counts[1]
         self.MIDcount = player_counts[2]
         self.FWDcount = player_counts[3] 
 
     def print_squad(self):
-        selected_GW = self.squad
-        for i in range(len(selected_GW)):
-            if isinstance(selected_GW[i],int):
-                print(selected_GW[i])
+        for i in range(len(self.squad)):
+            if isinstance(self.squad[i],int):
+                print(self.squad[i])
             else:
-                print(selected_GW[i].id,selected_GW[i].web_name)
+                print(self.squad[i].id,self.squad[i].web_name)
 
     def remove_player(self,id):
         player_to_remove = Player(id)
@@ -170,6 +174,21 @@ class GW_Squad:
             self.DEFcount = player_counts[1]
             self.MIDcount = player_counts[2]
             self.FWDcount = player_counts[3]     
+
+    def swap_players(self,id1,id2):
+        if len(self.squad) != 15:
+            return
+        else:
+            ids = []
+            for i in range(len(self.squad)):
+                ids.append(self.squad[i].id)
+
+            index1 = ids.index(id1)
+            index2 = ids.index(id2)
+
+            self.squad[index1], self.squad[index2] = self.squad[index2], self.squad[index1]
+            self.selling_prices[index1], self.selling_prices[index2] = self.selling_prices[index2], self.selling_prices[index1]
+            self.purchase_prices[index1], self.purchase_prices[index2] = self.purchase_prices[index2], self.purchase_prices[index1]
 
     def ClearSquad(self):
         self.squad = [0] * 15
